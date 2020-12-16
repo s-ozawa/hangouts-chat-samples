@@ -32,10 +32,98 @@ app.post('/', (req, res) => {
     text = `Thanks for adding me to a DM, ${req.body.user.displayName}`;
   // Case 3: Texting the BOT
   } else if (req.body.type === 'MESSAGE') {
-    text = `Your message : ${req.body.message.text}`;
+      // if (req.body.message.text === "btn"){
+      // const json = createOwnerCard(["company-name", "name", "location", "email"])
+      // return res.json(json);
+      // }
+      // text = `Your message : ${req.body.message.text}`;
+      // text = `g http://www.google.com`;
+      text = "<https://example.com/foo|my link text>"
+  } if (req.body.type == "CARD_CLICKED") {
+
+    // Update the card in place when the "UPVOTE" button is clicked.
+    if (req.body.action.actionMethodName == "cheet") {
+        const data = parseInt(req.body.action.parameters[0].value);
+        text = `extract data from button payload ${data}`
+    } else {
+        text = `I don't know your message type ${req.body.action.actionMethodName}`
+    }
   }
   return res.json({text});
 });
+
+function createOwnerCard(data) {
+  const company = data[0];
+  const name = data[1];
+  const location = data[2];
+  const email = data[3];
+
+  const cardHeader = {
+    title: company + ' Account Owner',
+    subtitle: name,
+      imageUrl: "https://lh6.googleusercontent.com/proxy/gpp_zxQ_-VCZPYrP1fGANctbkMB2dZ5i1R-asUkyFRo5etQ4qA4huyBmi5NF_FZt70x6WQVPhx2U0qTLkJjW_K_7CM4BNXrUTFHhQg",
+    imageStyle: 'IMAGE',
+  };
+
+  const emailWidget = {
+    keyValue: {
+      content: 'Email',
+      bottomLabel: email,
+    },
+  };
+
+  const locationWidget = {
+    keyValue: {
+      content: 'Location',
+      bottomLabel: location,
+    },
+  };
+
+    const buttons = [
+        {
+            "textButton": {
+                "text": "open google",
+                "onClick": {
+                    "openLink": {
+                        "url": "https://www.google.com"
+                    }
+                }
+            }
+        },
+
+        {
+            "textButton": {
+                "text": "cheet",
+                "onClick": {
+                    "action": {
+                        "actionMethodName": "cheet",
+                        "parameters": [
+                            {
+                                "key": "time",
+                                "value": "1 day"
+                            },
+                            {
+                                "key": "id",
+                                "value": "123456"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+
+    ]
+
+    const infoSection = {widgets: [emailWidget, locationWidget, {buttons}]};
+
+  const cards = [{
+    name: 'Status Card',
+    header: cardHeader,
+    sections: [infoSection],
+  }];
+
+  return {cards: cards};
+}
 
 app.listen(PORT, () => {
   console.log(`Server is running in port - ${PORT}`);
